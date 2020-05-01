@@ -1,4 +1,5 @@
 var cons = require('../constants.js')
+var util = require('../utils.js')
 
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
@@ -7,12 +8,15 @@ const assert = require('assert');
 const url = 'mongodb://localhost:27017';
 
 // Database Name
-const dbName = cons.dbName;
+module.exports.insertOne = function(coll,obj){
+  MongoClient.connect(url, function(err,db){
+    if(err) throw err;
+    var dbo = db.db(cons.dbName);
 
-// Use connect method to connect to the server
-MongoClient.connect(url, function(err, client) {
-  assert.equal(null, err);
-  console.log("Connected successfully to server");
-
-  module.exports.db = client.db(dbName);
-});
+    dbo.collection(coll).insertOne(obj, function(err,res){
+      if(err) throw err;
+      util.debug("1 document insert")
+      db.close()
+    })
+  })
+}

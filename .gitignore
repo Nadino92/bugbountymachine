@@ -1,0 +1,11 @@
+#pycache
+__pycache__/
+
+#python compiled
+*.pyc
+
+#logs
+logs/
+
+#tmp
+tmp/

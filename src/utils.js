@@ -1,9 +1,34 @@
 var cons = require('./constants.js')
+var slack = require('./alert/slack.js')
+
+var fs = require('fs')
 
 module.exports.debug = function(msg){
   if(cons.debug){
-    console.log(msg);
+    console.log(msg+"\n\n");
+    fs.appendFile(cons.logs, msg+"\n\n", function(err){
+      if(err) throw err;
+    })
   }
+}
+
+function statusHandler(error, stderr, stdout){
+  if (error) {
+      debug(`error: ${error.message}`);
+      slack.sendError(error.message, cmd)
+      //we will log what happened
+      return false;
+  }
+  if (stderr) {
+      debug(`stderr: ${stderr}`);
+      //slack.sendError(stderr, cmd)
+      //we will log the failure at runtime
+      return true;
+  }
+
+  //we will capture stdout and process it
+  debug(`stdout: ${stdout}`);
+  return true
 }
 
 module.exports.exec = function(cmd){
@@ -11,21 +36,7 @@ module.exports.exec = function(cmd){
 
 
   exec(cmd, (error, stdout, stderr) => {
-      if (error) {
-          console.log(`error: ${error.message}`);
-
-          //we will log what happened
-          return;
-      }
-      if (stderr) {
-          console.log(`stderr: ${stderr}`);
-
-          //we will log the failure at runtime
-          return;
-      }
-
-      //we will capture stdout and process it
-      console.log(`stdout: ${stdout}`);
+      return statusHandler(error, stderr, stdout)
   });
 }
 
@@ -34,20 +45,6 @@ module.exports.execSync = function(cmd){
 
 
   execSync(cmd, (error, stdout, stderr) => {
-      if (error) {
-          console.log(`error: ${error.message}`);
-
-          //we will log what happened
-          return;
-      }
-      if (stderr) {
-          console.log(`stderr: ${stderr}`);
-
-          //we will log the failure at runtime
-          return;
-      }
-
-      //we will capture stdout and process it
-      console.log(`stdout: ${stdout}`);
+      return statusHandler(error, stderr, stdout)
   });
 }

@@ -1,3 +1,3 @@
-var cmd = require('./cmd.js')
+var cmd = require('./utils.js')
 
-cmd.exec("echo 'hi'")
+cmd.exec("asd")

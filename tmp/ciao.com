@@ -1,0 +1,11 @@
+https://ciao.com
+http://ciao.com
+http://www.ciao.com
+https://fi.ciao.com
+http://fi.ciao.com
+https://ie.ciao.com
+http://ie.ciao.com
+https://dk.ciao.com
+http://dk.ciao.com
+https://pl.ciao.com
+http://pl.ciao.com
