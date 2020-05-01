@@ -1,6 +1,7 @@
 var util = require('./src/utils.js')
 var cons = require('./src/constants.js')
 var engine = require('./src/engine.js')
+var monitor = require('./src/monitor.js')
 
 fs = require('fs')
 const {spawn} = require('child_process')
@@ -19,6 +20,11 @@ try{
 var queue = []
 
 async function start(){
+
+  //setup processes
+  monitor.start("killall chrome",1)
+
+  //main core
   var engineQueue = 0
 
   while(queue.length > 0 || engineQueue > 0){

@@ -3,7 +3,7 @@ var slack = require('./alert/slack.js')
 
 var fs = require('fs')
 
-module.exports.debug = function(msg){
+function debug(msg){
   if(cons.debug){
     console.log(msg+"\n\n");
     fs.appendFile(cons.logs, msg+"\n\n", function(err){
@@ -12,12 +12,16 @@ module.exports.debug = function(msg){
   }
 }
 
-function statusHandler(error, stderr, stdout){
+module.exports.debug = function(msg) {
+  debug(msg)
+}
+
+function statusHandler(cmd, error, stderr, stdout){
   if (error) {
       debug(`error: ${error.message}`);
       slack.sendError(error.message, cmd)
       //we will log what happened
-      return false;
+      return true;
   }
   if (stderr) {
       debug(`stderr: ${stderr}`);
@@ -28,7 +32,7 @@ function statusHandler(error, stderr, stdout){
 
   //we will capture stdout and process it
   debug(`stdout: ${stdout}`);
-  return true
+  return stdout
 }
 
 module.exports.exec = function(cmd){
@@ -36,7 +40,7 @@ module.exports.exec = function(cmd){
 
 
   exec(cmd, (error, stdout, stderr) => {
-      return statusHandler(error, stderr, stdout)
+      return statusHandler(cmd, error, stderr, stdout)
   });
 }
 
@@ -45,6 +49,6 @@ module.exports.execSync = function(cmd){
 
 
   execSync(cmd, (error, stdout, stderr) => {
-      return statusHandler(error, stderr, stdout)
+      return statusHandler(cmd, error, stderr, stdout)
   });
 }

@@ -18,5 +18,5 @@ module.exports = {
 
   //cmd
   cmdAmass: "amass enum --passive -d ",
-  cmdHttprobe: "httprobe",
+  cmdHttprobe: "httprobe --prefer-https",
 }
