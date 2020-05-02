@@ -2,12 +2,14 @@ var cons = require('../constants.js')
 var util = require('../utils.js')
 
 var lr = require('line-reader')
+var proc = require('child_process')
 
-module.exports.test = function(file){
-  lr.eachLine(file, function(url, last){
-    const q = new URL(url)
+module.exports.test = async function(urls){
+  for(let item of urls.keys()) {
+    var spawn = proc.spawn("firefox", [item.href])
 
-    util.exec("google-chrome "+url+"/<script>alert(1)</script>")
+    await new Promise(resolve => setTimeout(resolve, 5000));
 
-  })
+    spawn.kill()
+  }
 }

@@ -5,12 +5,14 @@ var db = require('../db/db.js')
 var xss = require('../attack/xss.js')
 var nuclei = require('../attack/nuclei.js')
 var zap = require('../attack/zap.js')
+var sqlmap = require('../attack/sqlmap.js')
 
 var gau = require('./gau.js')
 
 var fs = require('fs')
 var lr = require('line-reader')
 var path = require('path')
+var proc = require('child_process')
 
 function alreadyScanned(domain) {
   var obj = {domain: {$regex: /.*${domain}.*/}}
@@ -28,6 +30,9 @@ function alreadyScanned(domain) {
 
 module.exports.recon = async function(line){
 
+  //avoid duplicates
+  var set = new Set()
+  //tmp path for files
   var tmpPath = path.resolve(__dirname)+"/../../tmp/"
 
   if(alreadyScanned(line)){
@@ -35,27 +40,54 @@ module.exports.recon = async function(line){
     return true
   }
 
-  fs.mkdirSync(tmpPath+line+"_dir")
+  if(!fs.existsSync(tmpPath+line+"_dir")){
+    fs.mkdirSync(tmpPath+line+"_dir")
+  }
 
   util.debug("Starting amass for "+line)
   util.execSync(cons.cmdAmass+line+" | "+cons.cmdHttprobe+" > $BBDIR/tmp/"+line)
 
   util.debug("Finished amass for "+line)
 
-  lr.eachLine(tmpPath+line, function(domain, last){
-    try{
+  lr.eachLine(tmpPath+line, async function(domain, last){
+
+    if(!set.has(domain)) {
+      set.add(domain)
+
       var name = domain.split("://")[1]+"_gau"
+
       util.debug("Name for gau "+name)
 
-      util.execSync("gau "+domain+" 1 > $BBDIR/tmp/"+line+"_dir/"+name+" 2> /dev/null")
+      proc.exec("gau "+domain, {maxBuffer: 100*1024*1024}, async (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            util.sendError(error.message, "gau "+domain)
+            //we will log what happened
+            return
+        }
 
-      xss.test(tmpPath+line+"_dir/"+name)
-    } catch(e) {/*nada, this is buggy*/}
+        var gaurls = stdout.split(/[\r\n]+/)
 
-    util.debug('domain '+domain)
-    var obj = {domain: domain};
+        util.debug("Gau extracted "+name)
 
-    db.getDb().collection(cons.dbDomain).insertOne(obj)
+        let urls = await util.validUrlScheme(gaurls,domain.split("://")[0])
+
+        util.debug("URLS validate ")
+
+        if(urls.size > 0){
+          //phase1 attack starts
+          //xss.test(urls)
+          sqlmap.test(urls)
+        }
+
+        return
+      })
+
+      util.debug('domain '+domain)
+      var obj = {domain: domain, phase1: false, phase2: false, phase3: false, crashed: false};
+
+      db.getDb().collection(cons.dbDomain).insertOne(obj)
+    }
 
     if(last) {
       util.debug("Recon is over for "+line)

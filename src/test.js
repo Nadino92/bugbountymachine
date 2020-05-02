@@ -1,15 +1,17 @@
 var cmd = require('./recon/amass.js')
 var gau = require('./recon/gau.js')
 var util =require ('./utils.js')
+var url = require('url')
 
-async function x(){
-var proc = require("child_process").spawn("google-chrome ",["\"https://hello.com/<script>alert(1)</script>\""])
+var proc = require("child_process")
 
-proc.on('error', function(err){console.log(err)})
+q = url.parse("https://cazzp.cpm/?hello=1")
 
-await new Promise(resolve => setTimeout(resolve, 5000));
+proc.exec("python3 $BBDIR/sqlmap-dev/sqlmap.py --batch -u "+q.href+" | grep 'might be injectable'", async (error, stdout, stderr) => {
+    if (error) {
+        console.log(`error: ${error.message}`);
+        return
+    }
 
-proc.kill('SIGINT')
-}
-
-x()
+    if(stdout){console.log("sqlmap STDOUT "+stdout)}
+})

@@ -79,7 +79,7 @@ func getOtxUrls(hostname string) ([]string, error) {
 		o := &OTXResult{}
 		err = json.Unmarshal(bytes, o)
 		if err != nil {
-			log.Fatalf("Could not decode json: %s\n", err)
+			//log.Fatalf("Could not decode json: %s\n", err)
 		}
 		for _, url := range o.URLList {
 			urls = append(urls, url.URL)
