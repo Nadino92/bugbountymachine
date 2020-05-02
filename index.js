@@ -22,23 +22,27 @@ var queue = []
 async function start(){
 
   //setup processes
-  monitor.start("killall chrome",1)
+  //monitor.start("killall chrome",1)
 
   //main core
   var engineQueue = 0
 
   while(queue.length > 0 || engineQueue > 0){
-    util.debug(JSON.stringify(queue) + " # in queue "+engineQueue )
-
     if(engineQueue < cons.maxQueue && queue.length > 0){
       var domain = queue.pop()
-      util.debug("Analyzing "+domain)
+      util.log("Starting thread => "+domain)
 
       var proc = spawn("node",["src/engine.js",domain])
 
       proc.on('exit', function(code, signal){
-        util.debug('child process exited with '+code+" and signal "+signal)
+        if(code == 0){
+          util.logOk('Process correctly finished')
+        } else {
+          util.logErr('Process exited with wrong status '+code)
+        }
         engineQueue--
+        util.log('Remaining to analyze '+queue.length)
+        util.log('Queue size '+engineQueue)
       })
       engineQueue++
     }
@@ -46,12 +50,12 @@ async function start(){
     await new Promise(resolve => setTimeout(resolve, 5000));
   }
 
-  util.debug("FINISH")
+  util.log("Finish")
 }
 
 //fetch all inscope domains
 lr.eachLine('./inscope.txt', function(line, last){
-  util.debug("Adding "+line+" to queue")
+  util.log("New queue element => "+line)
 
   queue.push(line)
 

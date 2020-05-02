@@ -7,8 +7,6 @@ var nuclei = require('../attack/nuclei.js')
 var zap = require('../attack/zap.js')
 var sqlmap = require('../attack/sqlmap.js')
 
-var gau = require('./gau.js')
-
 var fs = require('fs')
 var lr = require('line-reader')
 var path = require('path')
@@ -19,10 +17,6 @@ function alreadyScanned(domain) {
 
   return new Promise(function(resolve, reject){
     db.getDb().collection(cons.dbDomain).find(obj).toArray(function(err,docs){
-      console.log("ERROR DURING RETRIVE "+err)
-      console.log(JSON.stringify(docs))
-      console.log(docs.length)
-
       if(err){
         reject(err)
       } else {
@@ -48,24 +42,40 @@ module.exports.recon = async function(line){
     return true
   }
 
-  if(!fs.existsSync(tmpPath+line+"_dir")){
-    fs.mkdirSync(tmpPath+line+"_dir")
-  }
-
   util.debug("Starting amass for "+line)
-  util.execSync(cons.cmdAmass+line+" | "+cons.cmdHttprobe+" > $BBDIR/tmp/"+line)
 
-  util.debug("Finished amass for "+line)
+  var tmpfile = "$BBDIR/tmp/tmp_"+line
+  var massdns = "$BBDIR/massdns/bin/massdns -r "
+  var amass = cons.cmdAmass+line+" > "+tmpfile
+  var dnsgen = "dnsgen " + tmpfile +" -w $BBDIR/w.txt >> "+tmpfile
+
+  util.execSync(amass)
+  util.debug("Amass done "+line)
+//  util.execSync(dnsgen)
+  util.debug("Dnsgen done "+line)
+  util.execSync("cat "+tmpfile+" | "+cons.cmdHttprobe+" > $BBDIR/tmp/"+line)
+  util.debug("Httprobe done "+line)
+  util.execSync("rm "+tmpfile)
+
+  util.debug("Finished recon for "+line)
+
+  util.debug("START OF NUCLEI FOR "+line)
+
+  await nuclei.start(line)
+
+  util.debug("END OF NUCLEI FOR "+line)
 
   lr.eachLine(tmpPath+line, async function(domain, last){
 
     if(!set.has(domain)) {
       set.add(domain)
 
-      var name = domain.split("://")[1]+"_gau"
+      util.debug('domain '+domain)
+      var obj = {domain: domain, phase1: false, phase2: false, crashed: false};
 
-      util.debug("Name for gau "+name)
+      db.getDb().collection(cons.dbDomain).insertOne(obj)
 
+      util.debug("Starting gau "+domain)
       proc.exec("gau "+domain, {maxBuffer: 100*1024*1024}, async (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`);
@@ -76,7 +86,7 @@ module.exports.recon = async function(line){
 
         var gaurls = stdout.split(/[\r\n]+/)
 
-        util.debug("Gau extracted "+name)
+        util.debug("Gau extracted "+domain)
 
         let urls = await util.validUrlScheme(gaurls,domain.split("://")[0])
 
@@ -85,23 +95,32 @@ module.exports.recon = async function(line){
         if(urls.size > 0){
           //phase1 attack starts
           //xss.test(urls)
-          sqlmap.test(urls)
-        }
+          await sqlmap.test(urls)
+          }
 
-        return
+        db.getDb().collection(cons.dbDomain).updateOne(
+            {domain: domain},
+            { $set: { phase1: true }
+          })
+
+        util.debug("END OF PHASE1 FOR "+domain)
+
+        util.debug("START OF PHASE2 FOR "+domain)
+
+        //await zap.start(domain)
+
+        db.getDb().collection(cons.dbDomain).updateOne(
+            {domain: domain},
+            { $set: { phase2: true }
+          })
+
+        util.debug("END OF PHASE2 FOR "+domain)
       })
-
-      util.debug('domain '+domain)
-      var obj = {domain: domain, phase1: false, phase2: false, phase3: false, crashed: false};
-
-      db.getDb().collection(cons.dbDomain).insertOne(obj)
     }
 
     if(last) {
       util.debug("Recon is over for "+line)
-      return true
+      return
     }
   })
-
-  return true
 }

@@ -10,14 +10,14 @@ const url = 'mongodb://localhost:27017';
 module.exports = {
   connectToServer: function(callback){
       MongoClient.connect(url, function(err,db){
-      _db = db.db(cons.dbName);
+      _db = db
       return callback(err);
     })
   },
   getDb: function(){
-    return _db
+    return _db.db(cons.dbName);
   },
   close: function(){
-    MongoClient.close()
+    _db.close()
   }
 }

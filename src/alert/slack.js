@@ -19,3 +19,11 @@ async function send(channel,msg){
 module.exports.sendError = function(err,cmd){
   send(cons.channelErrors, cons.alertError+" "+cmd+"\n\n"+err)
 }
+
+module.exports.sendSqli = function(url){
+  send(cons.channelSqli, cons.alertSqli+" "+url)
+}
+
+module.exports.sendNuclei = function(url){
+  send(cons.channelNuclei, cons.alertNuclei+" "+url)
+}

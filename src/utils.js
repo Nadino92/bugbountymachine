@@ -32,6 +32,18 @@ function statusHandler(cmd, error, stderr, stdout){
   }
 }
 
+module.exports.logErr = function(msg){
+  console.log(cons.colorRed+"[-] "+cons.colorWhite+msg)
+}
+
+module.exports.logOk = function(msg){
+  console.log(cons.colorGreen+"[+] "+cons.colorWhite+msg)
+}
+
+module.exports.log = function(msg){
+  console.log(cons.colorYellow+"[*] "+cons.colorWhite+msg)
+}
+
 module.exports.sendError = function(msg, cmd){
   sendError(msg, cmd)
 }
@@ -65,7 +77,7 @@ module.exports.validUrlScheme = function(gaurls, scheme){
     }
   }
   console.log("final set= "+set.size)
-  
+
   return new Promise(function(resolve, reject){
     resolve(set)
   })

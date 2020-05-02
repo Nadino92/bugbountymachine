@@ -3,7 +3,6 @@ var util = require('./utils.js')
 var db = require('./db/db.js')
 
 var amass = require('./recon/amass.js')
-var gau = require('./recon/gau.js')
 
 var args = process.argv.slice(2)
 
@@ -11,9 +10,8 @@ async function recon(domain){
   amass.recon(domain)
 
   var notEmpty = true
-  do{
-    await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
 
+  while (notEmpty){
     var obj = {phase1:false, domain: {$regex: ".*"+domain}}
     db.getDb().collection(cons.dbDomain).find(obj).toArray(function(err,docs){
 
@@ -23,8 +21,8 @@ async function recon(domain){
     })
 
     console.log("notEmpty ? "+notEmpty)
-
-  } while (notEmpty)
+    await new Promise(resolve => setTimeout(resolve, 3 * 60 * 1000));
+  }
 
   console.log("Closing DB")
   db.close()
