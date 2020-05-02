@@ -8,9 +8,26 @@ var gau = require('./recon/gau.js')
 var args = process.argv.slice(2)
 
 async function recon(domain){
-  await amass.recon(domain)
+  amass.recon(domain)
 
-  //db.close()
+  var notEmpty = true
+  do{
+    await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
+
+    var obj = {phase1:false, domain: {$regex: ".*"+domain}}
+    db.getDb().collection(cons.dbDomain).find(obj).toArray(function(err,docs){
+
+      console.log("Still to be proccess "+docs.length)
+
+      notEmpty = docs.length > 0
+    })
+
+    console.log("notEmpty ? "+notEmpty)
+
+  } while (notEmpty)
+
+  console.log("Closing DB")
+  db.close()
 }
 
 if(args.length > 0){

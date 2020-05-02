@@ -65,5 +65,8 @@ module.exports.validUrlScheme = function(gaurls, scheme){
     }
   }
   console.log("final set= "+set.size)
-  return set
+  
+  return new Promise(function(resolve, reject){
+    resolve(set)
+  })
 }

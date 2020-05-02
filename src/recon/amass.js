@@ -15,16 +15,20 @@ var path = require('path')
 var proc = require('child_process')
 
 function alreadyScanned(domain) {
-  var obj = {domain: {$regex: /.*${domain}.*/}}
-  let res = db.getDb().collection(cons.dbDomain).find(obj).toArray(function(err,docs){
-    console.log(JSON.stringify(docs))
-    console.log(docs.length)
+  var obj = {domain: {$regex: ".*"+domain}}
 
-    if(docs){
-      return true
-    } else {
-      return false
-    }
+  return new Promise(function(resolve, reject){
+    db.getDb().collection(cons.dbDomain).find(obj).toArray(function(err,docs){
+      console.log("ERROR DURING RETRIVE "+err)
+      console.log(JSON.stringify(docs))
+      console.log(docs.length)
+
+      if(err){
+        reject(err)
+      } else {
+        resolve(docs)
+      }
+    })
   })
 }
 
@@ -35,7 +39,11 @@ module.exports.recon = async function(line){
   //tmp path for files
   var tmpPath = path.resolve(__dirname)+"/../../tmp/"
 
-  if(alreadyScanned(line)){
+  let alrScan = await alreadyScanned(line)
+
+  console.log("ALREADY SCANNED? "+alrScan.length)
+
+  if(alrScan.length > 0){
     util.debug("Already scanned "+line)
     return true
   }
