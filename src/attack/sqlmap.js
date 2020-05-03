@@ -24,7 +24,7 @@ module.exports.test = async function(urls){
         var key = param.split("=")[0]
 
         if(!set.has(key)){
-          console.log("adding "+key+" to set from "+item.href)
+          util.debug("adding "+key+" to set from "+item.href)
           set.add(key)
 
           var failed = false
@@ -34,7 +34,7 @@ module.exports.test = async function(urls){
           } catch(err) {failed = true}
 
           if(!failed){
-            console.log("SQQQQQQQQQQQLLLLLLLLLLLLL")
+            util.debug("SQQQQQQQQQQQLLLLLLLLLLLLL")
             slack.sendSqli(item.href)
           }
 

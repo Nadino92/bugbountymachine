@@ -16,7 +16,7 @@ try{
   fs.open(cons.logs, 'w',function(err){if(err) throw err;})
 }
 
-
+var start = Date.now()
 var queue = []
 
 async function start(){
@@ -47,10 +47,10 @@ async function start(){
       engineQueue++
     }
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 60 * 1000));
   }
 
-  util.log("Finish")
+  util.log("Finish "+new Date(Date.now()-start).getMinutes()+" minutes")
 }
 
 //fetch all inscope domains

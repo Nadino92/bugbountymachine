@@ -1,5 +1,12 @@
-trainingserver.eu
-evil.com
-cazzo.com
-hellosign.com
-ciao.com
+seek.com.au
+seek.com
+skinfra.xyz
+myseek.xyz
+outfra.xyz
+sol-data.com
+jobapi.net
+jobapi.io
+certsy.com
+certsynonprod.com
+aips-internal.com
+aips-services.com

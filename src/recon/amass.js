@@ -61,7 +61,7 @@ module.exports.recon = async function(line){
 
   util.debug("START OF NUCLEI FOR "+line)
 
-  await nuclei.start(line)
+  //await nuclei.start(line)
 
   util.debug("END OF NUCLEI FOR "+line)
 
@@ -78,7 +78,7 @@ module.exports.recon = async function(line){
       util.debug("Starting gau "+domain)
       proc.exec("gau "+domain, {maxBuffer: 100*1024*1024}, async (error, stdout, stderr) => {
         if (error) {
-            console.log(`error: ${error.message}`);
+            util.debug(`error: ${error.message}`);
             util.sendError(error.message, "gau "+domain)
             //we will log what happened
             return
@@ -94,8 +94,8 @@ module.exports.recon = async function(line){
 
         if(urls.size > 0){
           //phase1 attack starts
-          //xss.test(urls)
-          await sqlmap.test(urls)
+          await xss.test(urls)
+          //await sqlmap.test(urls)
           }
 
         db.getDb().collection(cons.dbDomain).updateOne(

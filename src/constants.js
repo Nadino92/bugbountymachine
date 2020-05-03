@@ -2,6 +2,7 @@ module.exports = {
   debug: true,
   maxQueue: 4,
   logs : "./logs/logs.txt",
+  xssHunter: "https://nadino.xss.ht",
 
   //database
   dbName: "test",

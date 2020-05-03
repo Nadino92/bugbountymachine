@@ -17,11 +17,11 @@ module.exports.start = function(file){
   templates.forEach(item => {
     var cmd = "cd $BBDIR/tmp; nuclei -silent -t \"$BBDIR/nuclei-templates/"+item+"\" -l "+file
 
-    console.log("CMD nuclei "+cmd)
+    util.debug("CMD nuclei "+cmd)
 
     proc.execSync(cmd, (error, stdout, stderr) => {
       if(stdout) {
-        console.log("NUCLEIIIIIIIIIIIIIIIIIII")
+        util.debug("NUCLEIIIIIIIIIIIIIIIIIII")
         slack.sendNuclei(stdout)
       }
     })

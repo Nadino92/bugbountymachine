@@ -9,7 +9,7 @@ var proc = require("child_process");
 function debug(msg){
   if(cons.debug){
     console.log(msg+"\n\n");
-    fs.appendFile(cons.logs, msg+"\n\n", function(err){
+    fs.appendFile(cons.logs, "["+Date.now+"] - "+msg+"\n\n", function(err){
       if(err) throw err;
     })
   }
@@ -69,6 +69,7 @@ module.exports.validUrlScheme = function(gaurls, scheme){
     var url = gaurls[i]
 
     if(url.startsWith("http")){
+      url = url.replace("&amp;","&")
       var q = urlP.parse(url, true)
 
       if(q.protocol.startsWith(scheme)){
