@@ -48,7 +48,7 @@ module.exports.recon = async function(line){
   var amass = cons.cmdAmass+line+" >> "+tmpfile
   var dnsgen = "dnsgen " + tmpfile +" -w $BBDIR/w.txt >> "+tmpfile
 
-  util.execSync(massdns)
+  //util.execSync(massdns)
   util.debug("massdns done "+line)
   util.execSync(amass)
   util.debug("Amass done "+line)
@@ -91,13 +91,16 @@ module.exports.recon = async function(line){
 
         let urls = await util.validUrlScheme(gaurls,domain.split("://")[0])
 
-        util.debug("URLS validate ")
+        util.debug("URLS validate "+urls.length)
 
-        if(urls.size > 0){
+        if(urls.size > 0 && urls.size < cons.maxUrls){
           //phase1 attack starts
           await xss.test(urls)
-          await sqlmap.test(urls)
+
+          if(urls.size < cons.maxUrls / 3){
+            await sqlmap.test(urls)
           }
+        }
 
         db.getDb().collection(cons.dbDomain).updateOne(
             {domain: domain},
@@ -108,7 +111,9 @@ module.exports.recon = async function(line){
 
         util.debug("START OF PHASE2 (ZAP) FOR "+domain)
 
-        util.execSync("python3 $BBDIR/src/attack/zap.py "+domain)
+        if(urls.size < cons.maxUrls){
+          util.execSync("python3 $BBDIR/src/attack/zap.py "+domain)
+        }
 
         db.getDb().collection(cons.dbDomain).updateOne(
             {domain: domain},

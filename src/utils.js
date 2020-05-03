@@ -33,15 +33,15 @@ function statusHandler(cmd, error, stderr, stdout){
 }
 
 module.exports.logErr = function(msg){
-  console.log(cons.colorRed+"[-] "+cons.colorWhite+msg)
+  console.log(cons.colorRed+"[-] "+cons.colorWhite+msg+" - ["+new Date().toISOString()+"]")
 }
 
 module.exports.logOk = function(msg){
-  console.log(cons.colorGreen+"[+] "+cons.colorWhite+msg)
+  console.log(cons.colorGreen+"[+] "+cons.colorWhite+msg+" - ["+new Date().toISOString()+"]")
 }
 
 module.exports.log = function(msg){
-  console.log(cons.colorYellow+"[*] "+cons.colorWhite+msg)
+  console.log(cons.colorYellow+"[*] "+cons.colorWhite+msg+" - ["+new Date().toISOString()+"]")
 }
 
 module.exports.sendError = function(msg, cmd){

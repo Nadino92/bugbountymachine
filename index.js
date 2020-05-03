@@ -16,7 +16,6 @@ try{
   fs.open(cons.logs, 'w',function(err){if(err) throw err;})
 }
 
-var start = Date.now()
 var queue = []
 
 async function start(){
@@ -36,9 +35,9 @@ async function start(){
 
       proc.on('exit', function(code, signal){
         if(code == 0){
-          util.logOk('Process correctly finished')
+          util.logOk('Process correctly finished '+domain)
         } else {
-          util.logErr('Process exited with wrong status '+code)
+          util.logErr('Process '+domain+' exited with wrong status '+code)
         }
         engineQueue--
         util.log('Remaining to analyze '+queue.length)
@@ -50,7 +49,7 @@ async function start(){
     await new Promise(resolve => setTimeout(resolve, 60 * 1000));
   }
 
-  util.log("Finish "+new Date(Date.now()-start).getMinutes()+" minutes")
+  util.log("Finish")
 }
 
 //fetch all inscope domains

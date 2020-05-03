@@ -18,7 +18,7 @@ while int(zap.spider.status(scanID)) < 100:
     time.sleep(1)
 
 # TODO : explore the app (Spider, etc) before using the Passive Scan API, Refer the explore section for details
-while int(zap.pscan.records_to_scan) > 0:
+while int(zap.ascan.records_to_scan) > 0:
     # Loop until the passive scan has finished
     #print('Records to passive scan : ' + zap.pscan.records_to_scan)
     time.sleep(2)
@@ -42,7 +42,6 @@ headers = {
 }
 
 for a in zap.core.alerts():
-    if a['risk'] == "Medium" or a['risk'] == "High":
-        if a['alert'] not in bannedAlerts:
-            data = '{"channel":"zap","text":"ZAP alert => '+a['alert']+'\n'+a['url']+'"}'
-            requests.post("https://slack.com/api/chat.postMessage", headers=headers, data=data)
+    if a['risk'] == "High":
+        data = '{"channel":"zap","text":"ZAP alert => '+a['alert']+'\n'+a['url']+'"}'
+        requests.post("https://slack.com/api/chat.postMessage", headers=headers, data=data)

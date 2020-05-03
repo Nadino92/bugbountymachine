@@ -8,7 +8,9 @@ var templates = [
       "subdomain-takeover/*.yaml",
       "vulnerabilities/*.yaml",
       "security-misconfiguration/*.yaml",
-      "files/*.yaml"
+      "files/*.yaml",
+      "panels/*.yaml",
+      "tokens/*.yaml"
       ]
 
 module.exports.start = function(file){
