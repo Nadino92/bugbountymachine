@@ -17,6 +17,7 @@
     "mongodb": "^3.5.7",
     "run-headless-chromium": "^0.1.1",
     "shodan-client": "^3.2.0",
-    "webpage": "^0.3.0"
+    "webpage": "^0.3.0",
+    "zaproxy": "^1.0.1"
   }
 }

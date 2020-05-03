@@ -12,7 +12,7 @@ async function recon(domain){
   var started = false
 
   while (!started){
-    var obj = {phase1:false, domain: {$regex: ".*"+domain}}
+    var obj = {domain: {$regex: ".*"+domain}}
     db.getDb().collection(cons.dbDomain).find(obj).toArray(function(err,docs){
 
       console.log("Still to be proccess "+docs.length)
@@ -20,7 +20,7 @@ async function recon(domain){
       started = docs.length > 0
     })
 
-    console.log("notEmpty ? "+notEmpty)
+    console.log("started ? "+started)
     await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
   }
 
@@ -36,7 +36,7 @@ async function recon(domain){
     })
 
     console.log("notEmpty ? "+notEmpty)
-    await new Promise(resolve => setTimeout(resolve, 3 * 60 * 1000));
+    await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
   }
 
   console.log("Closing DB")

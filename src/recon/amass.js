@@ -4,7 +4,6 @@ var db = require('../db/db.js')
 
 var xss = require('../attack/xss.js')
 var nuclei = require('../attack/nuclei.js')
-var zap = require('../attack/zap.js')
 var sqlmap = require('../attack/sqlmap.js')
 
 var fs = require('fs')
@@ -45,10 +44,12 @@ module.exports.recon = async function(line){
   util.debug("Starting amass for "+line)
 
   var tmpfile = "$BBDIR/tmp/tmp_"+line
-  var massdns = "$BBDIR/massdns/bin/massdns -r "
-  var amass = cons.cmdAmass+line+" > "+tmpfile
+  var massdns = "echo "+line+" > "+line+";$BBDIR/massdns/bin/massdns -r $BBDIR/massdns/lists/resolvers.txt -t AAAA -w "+line+" > "+tmpfile
+  var amass = cons.cmdAmass+line+" >> "+tmpfile
   var dnsgen = "dnsgen " + tmpfile +" -w $BBDIR/w.txt >> "+tmpfile
 
+  util.execSync(massdns)
+  util.debug("massdns done "+line)
   util.execSync(amass)
   util.debug("Amass done "+line)
 //  util.execSync(dnsgen)
@@ -61,7 +62,7 @@ module.exports.recon = async function(line){
 
   util.debug("START OF NUCLEI FOR "+line)
 
-  //await nuclei.start(line)
+  await nuclei.start(line)
 
   util.debug("END OF NUCLEI FOR "+line)
 
@@ -95,7 +96,7 @@ module.exports.recon = async function(line){
         if(urls.size > 0){
           //phase1 attack starts
           await xss.test(urls)
-          //await sqlmap.test(urls)
+          await sqlmap.test(urls)
           }
 
         db.getDb().collection(cons.dbDomain).updateOne(
@@ -105,9 +106,9 @@ module.exports.recon = async function(line){
 
         util.debug("END OF PHASE1 FOR "+domain)
 
-        util.debug("START OF PHASE2 FOR "+domain)
+        util.debug("START OF PHASE2 (ZAP) FOR "+domain)
 
-        //await zap.start(domain)
+        util.execSync("python3 $BBDIR/src/attack/zap.py "+domain)
 
         db.getDb().collection(cons.dbDomain).updateOne(
             {domain: domain},

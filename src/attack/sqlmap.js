@@ -30,7 +30,7 @@ module.exports.test = async function(urls){
           var failed = false
 
           try{
-            proc.execSync("python3 $BBDIR/sqlmap-dev/sqlmap.py --timeout 2 --batch -u '"+item.href+"' | grep 'might be injectable'")
+            proc.execSync("python3 $BBDIR/sqlmap-dev/sqlmap.py --timeout 2 --batch --current-db -u '"+item.href+"' | grep 'might be'")
           } catch(err) {failed = true}
 
           if(!failed){

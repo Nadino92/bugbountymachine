@@ -9,7 +9,7 @@ var proc = require("child_process");
 function debug(msg){
   if(cons.debug){
     console.log(msg+"\n\n");
-    fs.appendFile(cons.logs, "["+Date.now+"] - "+msg+"\n\n", function(err){
+    fs.appendFile(cons.logs, "["+new Date().toISOString()+"] - "+msg+"\n\n", function(err){
       if(err) throw err;
     })
   }
@@ -49,13 +49,13 @@ module.exports.sendError = function(msg, cmd){
 }
 
 module.exports.exec = function(cmd){
-  proc.exec(cmd, (error, stdout, stderr) => {
+  proc.exec(cmd, {maxBuffer: 100*1024*1024},(error, stdout, stderr) => {
       return statusHandler(cmd, error, stderr, stdout)
   });
 }
 
 module.exports.execSync = function(cmd){
-  proc.execSync(cmd, (error, stdout, stderr) => {
+  proc.execSync(cmd, {maxBuffer: 100*1024*1024},(error, stdout, stderr) => {
       return statusHandler(cmd, error, stderr, stdout)
   });
 }

