@@ -15,15 +15,3 @@ quantshack.com
 wordpress.org
 wordcamp.org
 buddypress.org
-bbpress.org
-profiles.wordpress.org
-secnews.gr
-githubapp.com
-github.net
-zomato.com
-zdev.net
-newrelic.com
-binary.com
-algolia.net
-algolianet.com
-shopify.com

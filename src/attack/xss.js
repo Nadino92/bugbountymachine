@@ -75,7 +75,7 @@ module.exports.test = async function(urls){
   util.debug("Payloads to be done "+payloads.length)
 
   var beginning = 0
-  var offset = 200
+  var offset = 100
 
   if(payloads.length > offset){
 

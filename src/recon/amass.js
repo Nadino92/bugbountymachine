@@ -91,7 +91,7 @@ module.exports.recon = async function(line){
 
         let urls = await util.validUrlScheme(gaurls,domain.split("://")[0])
 
-        util.debug("URLS validate "+urls.length)
+        util.debug("URLS validate "+urls.size)
 
         if(urls.size > 0 && urls.size < cons.maxUrls){
           //phase1 attack starts
@@ -112,7 +112,7 @@ module.exports.recon = async function(line){
         util.debug("START OF PHASE2 (ZAP) FOR "+domain)
 
         if(urls.size < cons.maxUrls){
-          util.execSync("python3 $BBDIR/src/attack/zap.py "+domain)
+          //util.execSync("python3 $BBDIR/src/attack/zap.py "+domain)
         }
 
         db.getDb().collection(cons.dbDomain).updateOne(
