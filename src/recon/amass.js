@@ -48,12 +48,16 @@ module.exports.recon = async function(line){
   var amass = cons.cmdAmass+line+" >> "+tmpfile
   var dnsgen = "dnsgen " + tmpfile +" -w $BBDIR/w.txt >> "+tmpfile
 
+  util.setCheckpoint("massdns "+line)
   //util.execSync(massdns)
   util.debug("massdns done "+line)
+  util.setCheckpoint("amass "+line)
   util.execSync(amass)
   util.debug("Amass done "+line)
+  util.setCheckpoint("dnsgens "+line)
 //  util.execSync(dnsgen)
   util.debug("Dnsgen done "+line)
+  util.setCheckpoint("httprobe "+line)
   util.execSync("cat "+tmpfile+" | "+cons.cmdHttprobe+" > $BBDIR/tmp/"+line)
   util.debug("Httprobe done "+line)
   util.execSync("rm "+tmpfile)
@@ -74,9 +78,12 @@ module.exports.recon = async function(line){
       util.debug('domain '+domain)
       var obj = {domain: domain, phase1: false, phase2: false, crashed: false};
 
+      util.setCheckpoint("insertOne "+domain)
       db.getDb().collection(cons.dbDomain).insertOne(obj)
 
       util.debug("Starting gau "+domain)
+
+      util.setCheckpoint("gau "+domain)
       proc.exec("gau "+domain, {maxBuffer: 100*1024*1024}, async (error, stdout, stderr) => {
         if (error) {
             util.debug(`error: ${error.message}`);
@@ -89,19 +96,23 @@ module.exports.recon = async function(line){
 
         util.debug("Gau extracted "+domain)
 
+        util.setCheckpoint("validUrlScheme "+domain)
         let urls = await util.validUrlScheme(gaurls,domain.split("://")[0])
 
         util.debug("URLS validate "+urls.size)
 
         if(urls.size > 0 && urls.size < cons.maxUrls){
           //phase1 attack starts
+          util.setCheckpoint("xss "+domain)
           await xss.test(urls)
 
           if(urls.size < cons.maxUrls / 3){
+            util.setCheckpoint("sqlmap "+domain)
             await sqlmap.test(urls)
           }
         }
 
+        util.setCheckpoint("updateOne "+domain)
         db.getDb().collection(cons.dbDomain).updateOne(
             {domain: domain},
             { $set: { phase1: true }

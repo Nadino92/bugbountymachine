@@ -8,28 +8,16 @@ console.log("start")
 
 var stdout2 = "acasa"
 
-proc.execSync("python3 $BBDIR/src/attack/zap.py https://dk.ciao.com", {maxBuffer: 100*1024*1024}, async (error, stdout, stderr) => {
-  if (error) {
-      util.debug(`error: ${error.message}`)
-      //we will log what happened
-      return
-  }
+var cmd = "echo pwd && nuclei -t \"$BBDIR/nuclei-templates/tokens/*.yaml\" -l $BBDIR/tmp/ciao.com"
 
-  stdout2=stdout
+util.debug("CMD nuclei "+cmd)
 
-  console.log("qualcosa "+stderr+" " +stdout+" "+ error)
-
-  util.debug("ZAP STDOUT '"+stdout+"'")
-
-  var obj = JSON.parse(stdout)
-
-  for(var i=0; i < obj.length; i++){
-    var alert = obj[i]
-
-    if(acceptedRisk.includes(alert.risk)){
-      util.debug("FOUND!!! "+alert.risk+" bug => "+alert.alert+" on "+alert.url)
-    }
+proc.execSync(cmd, (error, stdout, stderr) => {
+  console.log(stderr)
+  console.log(stdout)
+  console.log(error)
+  if(stdout) {
+    util.debug("NUCLEIIIIIIIIIIIIIIIIIII "+stdout)
+    slack.sendNuclei(stdout)
   }
 })
-
-console.log(stdout2)

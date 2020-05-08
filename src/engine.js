@@ -21,6 +21,7 @@ async function recon(domain){
     })
 
     console.log("started ? "+started)
+    util.printCheckpoint()
     await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
   }
 
@@ -36,6 +37,7 @@ async function recon(domain){
     })
 
     console.log("notEmpty ? "+notEmpty)
+    util.printCheckpoint()
     await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
   }
 

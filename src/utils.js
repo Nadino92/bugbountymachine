@@ -6,6 +6,8 @@ var lr = require('line-reader')
 var urlP = require('url')
 var proc = require("child_process");
 
+var checkpoint = "start"
+
 function debug(msg){
   if(cons.debug){
     console.log(msg+"\n\n");
@@ -13,6 +15,14 @@ function debug(msg){
       if(err) throw err;
     })
   }
+}
+
+module.exports.setCheckpoint = function(cp){
+  checkpoint = cp
+}
+
+module.exports.printCheckpoint = function(){
+  debug("Checkpoint: "+checkpoint)
 }
 
 module.exports.debug = function(msg) {
