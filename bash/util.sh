@@ -9,6 +9,13 @@ function percentage(){
   echo -ne "$bars"' ('"$x"'%)\r'
 }
 
+function debug(){
+  msg=$1
+
+  echo -e "\033[1;33m[*]\033[0m $msg"
+  echo -ne '\n'
+}
+
 function getExtension(){
   filename=$(basename -- "$1")
   echo "${filename##*.}"

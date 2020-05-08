@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
+source util.sh
+source constant.sh
+
 input="$BBDIR/inscope.txt"
+
+
+
 while IFS= read -r line
 do
-  echo "Read $line"
+  debug "Adding $line to queue"
   engine.sh $line
 done < "$input"
