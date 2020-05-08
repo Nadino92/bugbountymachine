@@ -8,11 +8,12 @@ domain=$1
 debug "Started engine for $domain"
 
 templates=(
-    "$nucleiTempDir/tokens/*.yaml"
+    "$nucleiTempDir/tokens/google-api-key.yaml"
     "$nucleiTempDir/panels/*.yaml"
     "$nucleiTempDir/security-misconfiguration/*.yaml"
     "$nucleiTempDir/subdomain-takeover/*.yaml"
     "$nucleiTempDir/files/*.yaml"
+    "$nucleiTempDir/cves/*.yaml"
     )
 
 nucleiFile="$nucleiFile$domain"
@@ -20,26 +21,27 @@ nucleigFile="$nucleigFile$domain"
 tmpFile="$tmpFile$domain"
 domFile="$domFile$domain"
 
-#amass enum -active -d $domain > $tmpFile
+debug "Starting amass for $domain"
 
-#cat $tmpFile | httprobe --prefer-https > $domFile
+amass enum --passive -d $domain 1> $tmpFile 2>/dev/null
+
+debug "Starting httprobe for $domain"
+
+cat $tmpFile | httprobe --prefer-https > $domFile
+rm $tmpFile
 
 for template in "${templates[@]}"
 do
+    debug "Nuclei $template started for $domain"
     nuclei -silent -t "$template" -l $domFile >> $nucleiFile
 done
 
 while IFS= read -r line
 do
+  debug "Attacking $line"
   ./attack.sh $line $domain
 done < "$domFile"
 
-if [[ -f $nucleiFile && -s $nucleiFile ]]; then
-    ./slack.sh "nuclei-general" "$nucleiFile"
-fi
+alertFiles $domain
 
-if [[ -f $nucleigFile && -s $nucleigFile ]]; then
-    ./slack.sh "nuclei-noisy" "$nucleigFile"
-fi
-
-rm $nucleigFile $nucleiFile
+increaseQueue

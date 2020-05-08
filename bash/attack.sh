@@ -22,6 +22,8 @@ noXssFiles=("jpg"
             "txt"
             "js")
 
+debug "Run gau for $subdomain"
+
 allurls=($(gau $subdomain))
 
 debug "Progress bar for $subdomain for ${#allurls[@]} urls"
@@ -35,7 +37,7 @@ do
     if [[ ! " ${noXssFiles[@]} " =~ " ${extension} " ]]; then
       if [[ $url == *"="* && $url == *"?"* ]]; then
         var=1
-        #dalfox url $url -blind https://nadino.xss.ht
+        #dalfox url $url --silence -blind https://nadino.xss.ht | grep "Triggered XSS payload" 1>> $xssFile$domain 2>/dev/null
       fi
     fi
 
