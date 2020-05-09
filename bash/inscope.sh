@@ -3,6 +3,8 @@
 source util.sh
 source constant.sh
 
+setQueue $1
+
 input="$BBDIR/inscope.txt"
 
 while IFS= read -r line
@@ -11,7 +13,8 @@ do
 
   while (( $currQueue == 0 ))
   do
-    sleep 2m
+    sleep 30
+    currQueue=$(getQueue)
   done
 
   debug "Adding $line to queue"

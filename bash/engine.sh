@@ -11,7 +11,7 @@ templates=(
     "$nucleiTempDir/tokens/google-api-key.yaml"
     "$nucleiTempDir/panels/*.yaml"
     "$nucleiTempDir/security-misconfiguration/*.yaml"
-    "$nucleiTempDir/subdomain-takeover/*.yaml"
+    "$nucleiTempDir/subdomain-takeover/detect-all-takeovers.yaml"
     "$nucleiTempDir/files/*.yaml"
     "$nucleiTempDir/cves/*.yaml"
     )
@@ -33,7 +33,7 @@ rm $tmpFile
 for template in "${templates[@]}"
 do
     debug "Nuclei $template started for $domain"
-    nuclei -silent -t "$template" -l $domFile >> $nucleiFile
+    nuclei -silent -t "$template" -l $domFile | ./slack.sh $channelNuclei
 done
 
 while IFS= read -r line
@@ -42,6 +42,6 @@ do
   ./attack.sh $line $domain
 done < "$domFile"
 
-alertFiles $domain
+#alertFiles $domain
 
 increaseQueue

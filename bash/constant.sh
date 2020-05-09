@@ -10,3 +10,6 @@ domFile="$BBDIR/tmp/"
 
 nucleiTempDir="$BBDIR/nuclei-templates"
 massdnsDir="$BBDIR/massdns/"
+
+channelNucleiNoisy="nuclei-noisy"
+channelNuclei="nuclei-general"

@@ -7,15 +7,24 @@ alertFiles=( "$nucleiFile:nuclei-general"
         "$xssFile:xss"
         "$sqliFile:sqli" )
 
-queue=4
+initQueue=0
+queue=0
+
+function setQueue(){
+  initQueue=$1
+  queue=initQueue
+}
 
 function percentage(){
-  val=$1
-  max=$2
 
-  x=$(($val * 100 / $max))
+  if (( $initQueue < 2 )); then
+    val=$1
+    max=$2
 
-  echo -ne "$bars"' ('"$x"'%)\r'
+    x=$(($val * 100 / $max))
+
+    echo -ne "$bars"' ('"$x"'%)\r'
+  fi
 }
 
 function debug(){

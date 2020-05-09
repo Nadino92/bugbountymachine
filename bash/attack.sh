@@ -24,7 +24,7 @@ noXssFiles=("jpg"
 
 debug "Run gau for $subdomain"
 
-allurls=($(gau $subdomain))
+allurls=($(timeout 300 gau $subdomain | sort -u | grep ".js"))
 
 debug "Progress bar for $subdomain for ${#allurls[@]} urls"
 
@@ -42,8 +42,8 @@ do
     fi
 
     if [ "$extension" == "js" ]; then
-      echo $url | nuclei -silent -t "$BBDIR/nuclei-templates/tokens/*.yaml" >> $nucleiFile$domain
-      echo $url | nuclei -silent -t "$BBDIR/nuclei-templates/noisy/*.yaml" >> $nucleigFile$domain
+      echo $url | nuclei -silent -t "$BBDIR/nuclei-templates/tokens/*.yaml" | ./slack.sh $channelNuclei
+      echo $url | nuclei -silent -t "$BBDIR/nuclei-templates/noisy/*.yaml" | ./slack.sh $channelNucleiNoisy
     fi
 
     let "index++"
