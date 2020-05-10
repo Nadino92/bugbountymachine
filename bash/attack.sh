@@ -40,8 +40,6 @@ do
       if [[ $url == *"="* && $url == *"?"* ]]; then
         newurl=$(./urlparse.py $url)
 
-        debug "Newurl generated $newurl"
-
         echo $newurl | nuclei -silent -t "$BBDIR/nuclei-templates/noisy/general-xss.yaml" | ./slack.sh $channelXss
       fi
     fi
