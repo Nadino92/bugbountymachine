@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+BBDIR="$HOME/bugbountymachine"
+
 nucleiFile="$BBDIR/tmp/nuclei_"
 nucleigFile="$BBDIR/tmp/nucleig_"
 xssFile="$BBDIR/tmp/xss_"
