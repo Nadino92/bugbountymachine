@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source util.sh
 source constant.sh
@@ -22,9 +22,11 @@ noXssFiles=("jpg"
             "txt"
             "js")
 
+checksum=()
+
 debug "Run gau for $subdomain"
 
-allurls=($(timeout 300 gau $subdomain | sort -u | grep ".js"))
+allurls=($(timeout 300 gau $subdomain | sort -u | egrep ".js|=" | egrep -v ".(jpg|jpeg|gif|css|tif|tiff|png|ttf|woff|woff2|ico|pdf|svg|txt)"))
 
 debug "Progress bar for $subdomain for ${#allurls[@]} urls"
 
@@ -34,16 +36,29 @@ for url in "${allurls[@]}"
 do
     extension=$(getExtension $url)
 
-    if [[ ! " ${noXssFiles[@]} " =~ " ${extension} " ]]; then
+    if [[ ! " ${noXssFiles[@]} " =~ " ${extension} " && $url != *".js"* ]]; then
       if [[ $url == *"="* && $url == *"?"* ]]; then
-        var=1
-        #dalfox url $url --silence -blind https://nadino.xss.ht | grep "Triggered XSS payload" 1>> $xssFile$domain 2>/dev/null
+        newurl=$(./urlparse.py $url)
+
+        debug "Newurl generated $newurl"
+
+        echo $newurl | nuclei -silent -t "$BBDIR/nuclei-templates/noisy/general-xss.yaml" | ./slack.sh $channelXss
       fi
     fi
 
-    if [ "$extension" == "js" ]; then
+    if [ "$url" == *".js"* ]; then
       echo $url | nuclei -silent -t "$BBDIR/nuclei-templates/tokens/*.yaml" | ./slack.sh $channelNuclei
-      echo $url | nuclei -silent -t "$BBDIR/nuclei-templates/noisy/*.yaml" | ./slack.sh $channelNucleiNoisy
+
+      #outNucleiN=$(echo $url | nuclei -silent -t "$BBDIR/nuclei-templates/noisy/general-tokens.yaml")
+      #md5NucleiN=$(echo $outNucleiN | md5sum | head -c 7)
+
+      #if [[ ! " ${checksum[@]} " =~ " ${md5NucleiN} " ]]; then
+      #  echo "$outNucleiN" | ./slack.sh $channelNucleiNoisy
+
+        #debug "Adding $md5NucleiN to the checksums"
+      #  checksum+=($md5NucleiN)
+      #fi
+
     fi
 
     let "index++"

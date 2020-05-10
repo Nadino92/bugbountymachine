@@ -3,23 +3,25 @@
 source util.sh
 source constant.sh
 
-setQueue $1
-
 input="$BBDIR/inscope.txt"
+
+rm $BBDIR/tmp/proc*
+rm $BBDIR/tmp/tmp*
 
 while IFS= read -r line
 do
-  currQueue=$(getQueue)
+  queue=($(ls $domFile | grep "proc"))
+  currQueue=${#queue[@]};
 
-  while (( $currQueue == 0 ))
+  while (( $currQueue >= $1 ))
   do
     sleep 30
-    currQueue=$(getQueue)
+
+    queue=($(ls $domFile | grep "proc"))
+    currQueue=${#queue[@]};
   done
 
   debug "Adding $line to queue"
 
-  decreaseQueue
   ./engine.sh $line &
-
 done < "$input"

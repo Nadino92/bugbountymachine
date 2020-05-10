@@ -7,24 +7,13 @@ alertFiles=( "$nucleiFile:nuclei-general"
         "$xssFile:xss"
         "$sqliFile:sqli" )
 
-initQueue=0
-queue=0
-
-function setQueue(){
-  initQueue=$1
-  queue=initQueue
-}
-
 function percentage(){
+  val=$1
+  max=$2
 
-  if (( $initQueue < 2 )); then
-    val=$1
-    max=$2
+  x=$(($val * 100 / $max))
 
-    x=$(($val * 100 / $max))
-
-    echo -ne "$bars"' ('"$x"'%)\r'
-  fi
+  echo -ne "$bars"' ('"$x"'%)\r'
 }
 
 function debug(){
@@ -35,22 +24,12 @@ function debug(){
 }
 
 function getExtension(){
-  filename=$(basename -- "$1")
+  prefix=="${1%?*}?"
+  echo "cazzo $prefix"
+  filename=$(basename -- "$prefix")
+  echo "filename $filename"
+  echo "finale ${filename##*.}"
   echo "${filename##*.}"
-}
-
-function decreaseQueue(){
-  let "queue--"
-  debug "Queue decreased now is $queue"
-}
-
-function increaseQueue(){
-  let "queue++"
-  debug "Queue increased now is $queue"
-}
-
-function getQueue(){
-  echo $queue
 }
 
 function alertFiles(){

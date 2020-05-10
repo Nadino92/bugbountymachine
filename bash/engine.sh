@@ -4,6 +4,8 @@ source constant.sh
 source util.sh
 
 domain=$1
+pid=$$
+echo $pid > $procFile$pid
 
 debug "Started engine for $domain"
 
@@ -23,17 +25,17 @@ domFile="$domFile$domain"
 
 debug "Starting amass for $domain"
 
-amass enum --passive -d $domain 1> $tmpFile 2>/dev/null
+#amass enum --passive -d $domain 1> $tmpFile 2>/dev/null
 
 debug "Starting httprobe for $domain"
 
-cat $tmpFile | httprobe --prefer-https > $domFile
+#cat $tmpFile | sort -u | httprobe --prefer-https > $domFile
 rm $tmpFile
 
 for template in "${templates[@]}"
 do
     debug "Nuclei $template started for $domain"
-    nuclei -silent -t "$template" -l $domFile | ./slack.sh $channelNuclei
+    #nuclei -silent -t "$template" -l $domFile | ./slack.sh $channelNuclei
 done
 
 while IFS= read -r line
@@ -42,6 +44,6 @@ do
   ./attack.sh $line $domain
 done < "$domFile"
 
-#alertFiles $domain
 
-increaseQueue
+rm $procFile$pid
+#alertFiles $domain
