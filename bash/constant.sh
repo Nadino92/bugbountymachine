@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 BBDIR="$HOME/bugbountymachine"
+SLACK_TOKEN=$(cat $HOME/slacktoken)
 
 nucleiFile="$BBDIR/tmp/nuclei_"
 nucleigFile="$BBDIR/tmp/nucleig_"
